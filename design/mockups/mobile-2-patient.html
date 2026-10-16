@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patient — Mobile</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .hdr { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .mtabs { display: flex; gap: 6px; overflow: hidden; }
+  .mtabs span { flex: none; height: 34px; padding: 0 14px; border-radius: 99px; display: flex; align-items: center; font-size: 13.5px; color: var(--text-2); background: #fff; border: 1px solid var(--border); }
+  .mtabs span.on { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
+  .timer { background: #fffcf4; border: 1px solid var(--warn-bd); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .big { font-size: 34px; font-weight: 700; line-height: 1; color: var(--warn); }
+  .steps { display: flex; gap: 4px; }
+  .steps i { flex: 1; height: 6px; border-radius: 3px; background: #f3dfb5; display: block; }
+  .steps i.done { background: #d98a0b; }
+  .mcard { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 13px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .mcard .h { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); font-weight: 500; }
+  .mcard .h .i { width: 16px; height: 16px; color: var(--primary); }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>13:33</span><span class="sys"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:11px"></i></span><span class="battery"><i></i></span></span></div>
+  <div class="appbar">
+    <span class="icon-btn" style="border:0;background:transparent;margin-left:-8px"><i data-i="back" data-s="22"></i></span>
+    <h1 class="grow" style="font-size:17px">เตียง 3</h1>
+    <span class="icon-btn"><i data-i="printer"></i></span>
+    <span class="icon-btn"><i data-i="morev"></i></span>
+  </div>
+  <div class="m-body" style="padding-bottom:110px">
+    <div class="hdr">
+      <div class="row" style="gap:12px">
+        <div class="avatar" style="width:46px;height:46px;border-radius:14px;font-size:16px">ปส</div>
+        <div class="grow">
+          <div class="b" style="font-size:17px">นายประเสริฐ สุขใจ</div>
+          <div class="xs muted num">ช 59 ปี · HN 0234567 · AN 6912310</div>
+        </div>
+      </div>
+      <div class="row wrap" style="gap:6px">
+        <span class="chip primary"><span class="dot"></span>กำลังรักษา · D1</span>
+        <span class="chip danger"><i data-i="alertcircle"></i>แพ้ Sulfa</span>
+        <span class="chip">UC</span>
+      </div>
+    </div>
+    <div class="mtabs"><span class="on">สรุป</span><span>Dx</span><span>SK</span><span>หัตถการ</span><span>อุปกรณ์</span></div>
+
+    <div class="timer">
+      <div class="row between"><span class="row b"><i data-i="timer" style="color:var(--warn)"></i>TR-band · Rt radial</span><span class="chip warn">ใช้งานอยู่</span></div>
+      <div class="row between" style="align-items:flex-end">
+        <div><div class="xs t2">ปล่อยลมครั้งถัดไป 13:45</div><div class="big num">12 <span style="font-size:18px">นาที</span></div></div>
+        <div class="xs t2 num" style="text-align:right">ใส่ 11:40<br>ลมคงเหลือ <b>15 ml</b></div>
+      </div>
+      <div class="steps"><i class="done"></i><i></i><i></i><i></i><i></i></div>
+      <span class="btn primary block lg" style="height:46px">บันทึกปล่อยลม</span>
+    </div>
+
+    <div class="mcard">
+      <div class="h"><i data-i="steth"></i>Diagnosis</div>
+      <div class="b">Acute inferior wall STEMI <span class="muted xs">I21.1</span></div>
+      <div class="row wrap" style="gap:5px"><span class="chip ok">Killip I</span><span class="chip primary">DM</span><span class="chip primary">HT</span><span class="chip primary">DLP</span><span class="chip primary">สูบบุหรี่</span></div>
+    </div>
+    <div class="mcard">
+      <div class="h"><i data-i="syringe"></i>SK ที่ รพ.หนองหาน</div>
+      <div class="row between"><span class="small">Door-to-needle <b class="num">23 นาที</b></span><span class="chip ok"><i data-i="check"></i>≤ 30 นาที</span></div>
+      <div class="xs t2">Reperfusion ไม่สำเร็จ → Rescue PCI</div>
+    </div>
+    <div class="mcard">
+      <div class="h"><i data-i="activity"></i>หัตถการ</div>
+      <div class="row between"><span class="b">CAG + Rescue PCI to RCA</span><span class="chip ok">สำเร็จ</span></div>
+      <div class="xs t2 num">Rt radial 6Fr · DES × 1 · TIMI 0 → 3</div>
+    </div>
+  </div>
+  <div class="sticky-foot">
+    <span class="btn lg" style="flex:1"><i data-i="bed"></i>ย้ายตึก</span>
+    <span class="btn lg primary" style="flex:1.4"><i data-i="logout"></i>จำหน่าย</span>
+  </div>
+  <div class="home-ind"></div>
+</div>
+<script src="assets/icons.js"></script>
+</body>
+</html>

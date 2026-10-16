@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Reports — Desktop</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .viz-root {
+    --surface-1: #ffffff;
+    --series-1: #2a78d6;
+    --grid: #e6e9ee;
+    --axis: #c3c9d2;
+    --ink-2: #46546a;
+    --ink-muted: #7b8798;
+  }
+  .tiles5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  .delta { font-size: 12px; font-weight: 600; }
+  .delta.good { color: #006300; }
+  .row2 { display: grid; grid-template-columns: 1.75fr 1fr; gap: 16px; }
+  .row3 { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 16px; }
+  .chart-sub { font-size: 12.5px; color: var(--muted); font-weight: 400; }
+  svg text { font-family: var(--font); }
+  .tbl.compact td, .tbl.compact th { padding: 9px 14px; }
+  .mini { height: 6px; border-radius: 3px; background: var(--series-1); display: inline-block; vertical-align: middle; }
+</style>
+</head>
+<body style="width:1440px">
+<div data-shell="reports">
+  <div class="page-h">
+    <div>
+      <h1>รายงานและตัวชี้วัด</h1>
+      <p>ปีงบประมาณ 2569 (1 ต.ค. 2568 – 30 ก.ย. 2569) · ข้อมูล ณ 16 ต.ค. 2569</p>
+    </div>
+    <div class="row">
+      <div class="seg"><span>เดือน</span><span>ไตรมาส</span><span class="on">ปีงบประมาณ</span><span>กำหนดเอง</span></div>
+      <span class="btn">ปีงบ 2569<i data-i="down"></i></span>
+      <span class="btn"><i data-i="download"></i>Excel</span>
+      <span class="btn"><i data-i="printer"></i>PDF</span>
+    </div>
+  </div>
+
+  <div class="tiles5">
+    <div class="card tile"><div class="lbl">ผู้ป่วยรับใหม่</div><div class="val">1,284</div><div class="sub"><span class="delta good">▲ 6.2%</span> เทียบปีงบ 2568</div></div>
+    <div class="card tile"><div class="lbl">วันนอนเฉลี่ย (LOS)</div><div class="val">4.2 <small>วัน</small></div><div class="sub"><span class="delta good">▼ 0.3 วัน</span> เทียบปีงบ 2568</div></div>
+    <div class="card tile"><div class="lbl">อัตราตายในโรงพยาบาล</div><div class="val">3.1%</div><div class="sub">40 ราย · STEMI 7.8%</div></div>
+    <div class="card tile"><div class="lbl">Door-to-needle ≤ 30 นาที</div><div class="val">78%</div><div class="meter warn"><i style="width:78%"></i></div><div class="sub">เป้าหมาย ≥ 80%</div></div>
+    <div class="card tile"><div class="lbl">Access-site complication</div><div class="val">1.6%</div><div class="sub">19 จาก 1,205 หัตถการ (arterial)</div></div>
+  </div>
+
+  <div class="row2 viz-root">
+    <div class="card">
+      <div class="card-h"><h3>ผู้ป่วยรับใหม่รายเดือน <span class="chart-sub">ราย</span></h3><span class="btn ghost sm"><i data-i="list"></i>ดูเป็นตาราง</span></div>
+      <div class="card-b" id="c-adm"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>ผลการออกจากตึก <span class="chart-sub">ราย (% ของทั้งหมด)</span></h3></div>
+      <div class="card-b" id="c-out"></div>
+    </div>
+  </div>
+
+  <div class="row3 viz-root">
+    <div class="card">
+      <div class="card-h"><h3>Door-to-needle (SK) มัธยฐาน <span class="chart-sub">นาที</span></h3></div>
+      <div class="card-b" id="c-d2n"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>หัตถการแยกประเภท <span class="chart-sub">ครั้ง</span></h3></div>
+      <div class="card-b" id="c-px"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>Refer back แยกโรงพยาบาล</h3></div>
+      <table class="tbl compact">
+        <thead><tr><th>โรงพยาบาลปลายทาง</th><th style="text-align:right">ราย</th></tr></thead>
+        <tbody id="t-refer"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Mockup data — illustrative numbers only
+  const NS = 'http://www.w3.org/2000/svg';
+  const months = ['ต.ค.', 'พ.ย.', 'ธ.ค.', 'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.'];
+  const C = { s: 'var(--series-1)', grid: 'var(--grid)', axis: 'var(--axis)', ink: 'var(--ink-2)', muted: 'var(--ink-muted)', surf: 'var(--surface-1)' };
+  const txt = (x, y, s, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size || 11.5}" fill="${o.fill || C.muted}" text-anchor="${o.anchor || 'middle'}" font-weight="${o.w || 400}">${s}</text>`;
+  const colPath = (x, y, w, h, r) => `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`;
+  const hbarPath = (x, y, w, h, r) => `M${x},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h - r}Q${x + w},${y + h} ${x + w - r},${y + h}H${x}Z`;
+
+  // 1) Monthly admissions — columns
+  (function () {
+    const v = [98, 104, 112, 121, 108, 99, 103, 110, 105, 116, 102, 106];
+    const W = 760, H = 250, L = 34, R = 8, T = 18, B = 26, max = 140;
+    const pw = W - L - R, ph = H - T - B, band = pw / v.length, bw = 24;
+    let g = '';
+    [0, 35, 70, 105, 140].forEach((t) => { const y = T + ph - (t / max) * ph; g += `<line x1="${L}" x2="${W - R}" y1="${y}" y2="${y}" stroke="${t ? C.grid : C.axis}" stroke-width="1"/>` + txt(L - 8, y + 4, t, { anchor: 'end' }); });
+    const peak = v.indexOf(Math.max(...v));
+    v.forEach((d, i) => {
+      const h = (d / max) * ph, x = L + band * i + (band - bw) / 2, y = T + ph - h;
+      g += `<path d="${colPath(x, y, bw, h, 4)}" fill="${C.s}"/>`;
+      if (i === peak || i === v.length - 1) g += txt(x + bw / 2, y - 6, d, { fill: C.ink, w: 600, size: 12 });
+      g += txt(x + bw / 2, H - 6, months[i]);
+    });
+    document.getElementById('c-adm').innerHTML = `<svg width="100%" viewBox="0 0 ${W} ${H}">${g}</svg>`;
+  })();
+
+  // 2) Outcomes — horizontal bars, one series
+  (function () {
+    const d = [['ทุเลา (กลับบ้าน)', 912], ['Refer back', 218], ['ย้ายตึก', 114], ['เสียชีวิต', 40]];
+    const total = 1284, W = 400, rowH = 52, L = 0, barMax = 270, H = d.length * rowH;
+    let g = '';
+    d.forEach(([k, n], i) => {
+      const y = i * rowH, w = Math.max(4, (n / 912) * barMax);
+      g += txt(0, y + 14, k, { anchor: 'start', fill: C.ink, size: 13 });
+      g += `<path d="${hbarPath(L, y + 22, w, 16, 4)}" fill="${C.s}"/>`;
+      g += txt(w + 8, y + 35, `${n.toLocaleString()} <tspan fill="${C.muted}">(${(n / total * 100).toFixed(1)}%)</tspan>`, { anchor: 'start', fill: C.ink, size: 12.5, w: 600 });
+    });
+    document.getElementById('c-out').innerHTML = `<svg width="100%" viewBox="0 0 ${W} ${H}">${g}</svg><div class="small muted" style="margin-top:6px">รวม 1,284 ราย · ข้อมูลไม่ครบ 0 ราย</div>`;
+  })();
+
+  // 3) Door-to-needle median — line with target reference
+  (function () {
+    const v = [34, 31, 29, 33, 28, 27, 30, 26, 25, 27, 24, 23];
+    const W = 460, H = 270, L = 30, R = 64, T = 14, B = 26, min = 15, max = 40;
+    const pw = W - L - R, ph = H - T - B;
+    const X = (i) => L + (pw / (v.length - 1)) * i, Y = (d) => T + ph - ((d - min) / (max - min)) * ph;
+    let g = '';
+    [15, 20, 25, 30, 35, 40].forEach((t) => { g += `<line x1="${L}" x2="${W - R}" y1="${Y(t)}" y2="${Y(t)}" stroke="${t === 15 ? C.axis : C.grid}"/>` + txt(L - 7, Y(t) + 4, t, { anchor: 'end' }); });
+    g += `<line x1="${L}" x2="${W - R}" y1="${Y(30)}" y2="${Y(30)}" stroke="${C.ink}" stroke-width="1"/>` + txt(W - R + 6, Y(30) + 4, 'เป้า 30', { anchor: 'start', fill: C.ink, size: 11.5, w: 600 });
+    g += `<polygon points="${v.map((d, i) => `${X(i)},${Y(d)}`).join(' ')} ${X(v.length - 1)},${Y(min)} ${X(0)},${Y(min)}" fill="${C.s}" opacity=".10"/>`;
+    g += `<polyline points="${v.map((d, i) => `${X(i)},${Y(d)}`).join(' ')}" fill="none" stroke="${C.s}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    const li = v.length - 1;
+    g += `<circle cx="${X(li)}" cy="${Y(v[li])}" r="5" fill="${C.s}" stroke="${C.surf}" stroke-width="2"/>` + txt(X(li) + 10, Y(v[li]) + 4, `${v[li]} นาที`, { anchor: 'start', fill: C.ink, w: 600, size: 12 });
+    [0, 3, 6, 9, 11].forEach((i) => { g += txt(X(i), H - 6, months[i]); });
+    document.getElementById('c-d2n').innerHTML = `<svg width="100%" viewBox="0 0 ${W} ${H}">${g}</svg>`;
+  })();
+
+  // 4) Procedures by type — horizontal bars
+  (function () {
+    const d = [['CAG', 642], ['PCI (elective)', 418], ['Primary PCI', 96], ['TPM', 74], ['PPM', 52], ['Rescue PCI', 31], ['IABP', 18]];
+    const W = 360, rowH = 38, L = 104, barMax = 190, H = d.length * rowH;
+    let g = '';
+    d.forEach(([k, n], i) => {
+      const y = i * rowH, w = Math.max(3, (n / 642) * barMax);
+      g += txt(L - 10, y + 22, k, { anchor: 'end', fill: C.ink, size: 12.5 });
+      g += `<path d="${hbarPath(L, y + 10, w, 16, 4)}" fill="${C.s}"/>`;
+      g += txt(L + w + 7, y + 22.5, n, { anchor: 'start', fill: C.ink, size: 12, w: 600 });
+    });
+    g += `<line x1="${L}" x2="${L}" y1="0" y2="${H}" stroke="${C.axis}"/>`;
+    document.getElementById('c-px').innerHTML = `<svg width="100%" viewBox="0 0 ${W} ${H}">${g}</svg>`;
+  })();
+
+  // 5) Refer back table
+  document.getElementById('t-refer').innerHTML = [
+    ['รพ.กุมภวาปี', 34], ['รพ.หนองหาน', 29], ['รพ.บ้านดุง', 22], ['รพ.เพ็ญ', 19], ['รพ.หนองวัวซอ', 15], ['รพ.บ้านผือ', 14], ['อื่น ๆ (14 แห่ง)', 85],
+  ].map(([h, n]) => `<tr><td>${h}</td><td class="num" style="text-align:right"><span class="mini" style="width:${Math.min(n, 34) * 2}px;margin-right:8px;${h.startsWith('อื่น') ? 'background:var(--ink-muted);opacity:.5' : ''}"></span><b>${n}</b></td></tr>`).join('');
+</script>
+<script src="assets/shell.js"></script>
+<script src="assets/icons.js"></script>
+</body>
+</html>

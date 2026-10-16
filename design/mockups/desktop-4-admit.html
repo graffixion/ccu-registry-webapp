@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Admit form — Desktop</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .layout { display: grid; grid-template-columns: 176px 1fr 280px; gap: 20px; align-items: start; }
+  .toc { display: flex; flex-direction: column; gap: 2px; position: sticky; top: 0; }
+  .toc a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px; font-size: 13.5px; color: var(--text-2); text-decoration: none; }
+  .toc a .n { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border-strong); font-size: 11.5px; display: flex; align-items: center; justify-content: center; font-weight: 600; flex: none; }
+  .toc a.done .n { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .toc a.on { background: #fff; box-shadow: var(--shadow); color: var(--text); font-weight: 600; }
+  .toc a.on .n { border-color: var(--primary); color: var(--primary); }
+  .sec-h { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .sec-h .n { width: 26px; height: 26px; border-radius: 8px; background: var(--primary-50); color: var(--primary-700); font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+  .sec-h h3 { font-size: 15.5px; font-weight: 600; }
+  .sec-b { padding: 18px; }
+  .found { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: var(--info-bg); border: 1px solid var(--info-bd); color: var(--info); font-size: 13px; }
+  .tag { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 6px 0 10px; border-radius: 7px; background: var(--danger-bg); color: var(--danger); font-size: 12.5px; font-weight: 500; }
+  .tag .i { width: 13px; height: 13px; }
+  .udgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 14px; }
+  .side { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 0; }
+  .ring { width: 64px; height: 64px; border-radius: 50%; background: conic-gradient(var(--primary) 0 68%, var(--primary-100) 68% 100%); display: flex; align-items: center; justify-content: center; flex: none; }
+  .ring span { width: 50px; height: 50px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; }
+  .req-list { display: flex; flex-direction: column; gap: 7px; font-size: 13px; }
+  .req-list div { display: flex; gap: 8px; align-items: center; }
+  .req-list .ok { color: var(--ok); }
+  .req-list .no { color: var(--muted); }
+  .phase { font-size: 10.5px; font-weight: 600; border-radius: 5px; padding: 0 6px; background: var(--violet-bg); color: var(--violet); border: 1px solid var(--violet-bd); }
+</style>
+</head>
+<body style="width:1440px">
+<div data-shell="admit">
+  <div class="page-h">
+    <div>
+      <div class="crumb">ทะเบียนผู้ป่วย<i data-i="right"></i>รับผู้ป่วยใหม่</div>
+      <h1>รับผู้ป่วยใหม่ (Admit)</h1>
+    </div>
+    <div class="row">
+      <span class="btn ghost">ยกเลิก</span>
+      <span class="btn"><i data-i="save"></i>บันทึกร่าง</span>
+      <span class="btn primary"><i data-i="bed"></i>บันทึกและรับเข้าเตียง</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="toc">
+      <a class="done"><span class="n"><i data-i="check" data-s="13" style="stroke-width:3"></i></span>ข้อมูลผู้ป่วย</a>
+      <a class="on"><span class="n">2</span>ที่อยู่และผู้ติดต่อ</a>
+      <a><span class="n">3</span>ข้อมูลการรับไว้</a>
+      <a><span class="n">4</span>Dx &amp; U/D</a>
+      <a><span class="n">5</span>SK / Time metrics</a>
+      <div class="divider" style="margin:8px 4px"></div>
+      <div class="xs muted" style="padding:0 10px">หัตถการ อุปกรณ์ และ Complication บันทึกได้หลังรับเข้าเตียง</div>
+    </div>
+
+    <div class="stack" style="gap:16px">
+      <div class="card">
+        <div class="sec-h"><span class="n">1</span><h3>ข้อมูลผู้ป่วย</h3></div>
+        <div class="sec-b stack" style="gap:14px">
+          <div class="grid" style="grid-template-columns: 1fr 1fr auto; align-items:end">
+            <div class="field"><span class="label">HN <span class="req">*</span></span><div class="input ok"><span class="num b">0234567</span><span class="end"><i data-i="checkcircle" style="color:var(--ok)"></i></span></div></div>
+            <div class="field"><span class="label">เลขบัตรประชาชน <span class="req">*</span></span><div class="input ok num">3-4105-00123-45-5<span class="end"><i data-i="checkcircle" style="color:var(--ok)"></i></span></div></div>
+            <span class="btn soft"><i data-i="clouddown"></i>ดึงจาก HIS <span class="phase">Phase 2</span></span>
+          </div>
+          <div class="found"><i data-i="info"></i><span><b>พบผู้ป่วยเดิมในระบบ</b> — เคย Admit ตึกนี้ 1 ครั้ง (AN 6801122 · 3 ก.พ. 2568 · NSTEMI) ระบบเติมข้อมูลให้แล้ว กรุณาตรวจสอบ</span></div>
+          <div class="grid g4">
+            <div class="field"><span class="label">คำนำหน้า</span><div class="input">นาย<span class="end"><i data-i="down"></i></span></div></div>
+            <div class="field"><span class="label">ชื่อ <span class="req">*</span></span><div class="input">ประเสริฐ</div></div>
+            <div class="field"><span class="label">นามสกุล <span class="req">*</span></span><div class="input">สุขใจ</div></div>
+            <div class="field"><span class="label">เพศ</span><div class="seg"><span class="on">ชาย</span><span>หญิง</span></div></div>
+            <div class="field"><span class="label">วันเกิด (พ.ศ.) · <b class="t2">59 ปี</b></span><div class="input num"><i data-i="calendar"></i>12/03/2510</div></div>
+            <div class="field"><span class="label">สิทธิการรักษา <span class="req">*</span></span><div class="input">UC (บัตรทอง)<span class="end"><i data-i="down"></i></span></div></div>
+            <div class="field"><span class="label">น้ำหนัก / ส่วนสูง (cm)</span><div class="input num">68 kg / 168</div></div>
+            <div class="field"><span class="label">กรุ๊ปเลือด</span><div class="input">O Rh+<span class="end"><i data-i="down"></i></span></div></div>
+          </div>
+          <div class="field"><span class="label">ประวัติแพ้ยา / สารทึบรังสี</span><div class="input"><span class="tag">Sulfa<i data-i="x"></i></span><span class="muted small">พิมพ์ชื่อยาเพื่อเพิ่ม…</span></div></div>
+        </div>
+      </div>
+
+      <div class="card" style="box-shadow:0 0 0 2px var(--primary-100), var(--shadow)">
+        <div class="sec-h"><span class="n">2</span><h3>ที่อยู่และผู้ติดต่อ</h3></div>
+        <div class="sec-b stack" style="gap:14px">
+          <div class="grid" style="grid-template-columns: 1fr 1fr 2fr">
+            <div class="field"><span class="label">บ้านเลขที่</span><div class="input">45</div></div>
+            <div class="field"><span class="label">หมู่</span><div class="input">7</div></div>
+            <div class="field"><span class="label">ถนน / ซอย</span><div class="input ph">—</div></div>
+          </div>
+          <div class="grid g4">
+            <div class="field span2" style="position:relative"><span class="label">ตำบล <span class="req">*</span> <span class="muted xs">(พิมพ์แล้วเลือก ระบบเติมที่เหลือให้)</span></span><div class="input focus">หนองหาน<span class="end"><i data-i="search"></i></span></div></div>
+            <div class="field"><span class="label">อำเภอ</span><div class="input ro">หนองหาน</div></div>
+            <div class="field"><span class="label">จังหวัด / รหัสไปรษณีย์</span><div class="input ro num">อุดรธานี · 41130</div></div>
+          </div>
+          <div class="grid g3">
+            <div class="field"><span class="label">โทรศัพท์ผู้ป่วย</span><div class="input num"><i data-i="phone"></i>081-234-4521</div></div>
+            <div class="field"><span class="label">ญาติผู้ติดต่อ</span><div class="input">นางสมใจ สุขใจ (ภรรยา)</div></div>
+            <div class="field"><span class="label">โทรศัพท์ญาติ</span><div class="input err num"><i data-i="phone"></i>089-123-45<span class="end"><i data-i="alertcircle" style="color:var(--danger)"></i></span></div><span class="help err"><i data-i="alertcircle"></i>เบอร์โทรต้องมี 10 หลัก</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-h"><span class="n">3</span><h3>ข้อมูลการรับไว้</h3></div>
+        <div class="sec-b stack" style="gap:14px">
+          <div class="grid g3">
+            <div class="field"><span class="label">AN <span class="req">*</span></span><div class="input num">6912310</div></div>
+            <div class="field"><span class="label">วันเวลา Admit <span class="req">*</span></span><div class="input num"><i data-i="calendar"></i>16/10/2569 09:10</div></div>
+            <div class="field"><span class="label">เตียง <span class="req">*</span> <span class="xs" style="color:var(--ok)">ว่าง 2 เตียง</span></span><div class="input">เตียง 3<span class="end"><i data-i="down"></i></span></div></div>
+          </div>
+          <div class="field"><span class="label">รับจาก <span class="req">*</span></span><div class="seg" style="align-self:flex-start"><span>ER</span><span>OPD</span><span class="on">Refer-in</span><span>ย้ายจากตึกอื่น</span><span>Cath lab</span></div></div>
+          <div class="grid g3">
+            <div class="field span2"><span class="label">โรงพยาบาลต้นทาง</span><div class="input"><i data-i="building"></i>รพ.หนองหาน <span class="muted small">(รหัสสถานพยาบาล 5 หลัก)</span><span class="end"><i data-i="down"></i></span></div></div>
+            <div class="field"><span class="label">แพทย์เจ้าของไข้ <span class="req">*</span></span><div class="input">นพ.ตัวอย่าง<span class="end"><i data-i="down"></i></span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-h"><span class="n">4</span><h3>Dx &amp; U/D</h3></div>
+        <div class="sec-b stack" style="gap:14px">
+          <div class="grid" style="grid-template-columns: 2fr 1fr">
+            <div class="field"><span class="label">Principal Dx <span class="req">*</span> <span class="muted xs">(ค้นหาด้วยชื่อโรคหรือรหัส ICD-10)</span></span><div class="input"><span class="chip">I21.1</span>Acute inferior wall STEMI<span class="end"><i data-i="search"></i></span></div></div>
+            <div class="field"><span class="label">Killip class</span><div class="seg"><span class="on">I</span><span>II</span><span>III</span><span>IV</span></div></div>
+          </div>
+          <div class="field"><span class="label">Underlying disease (U/D)</span>
+            <div class="udgrid">
+              <span class="check"><span class="box on"><i data-i="check"></i></span>DM</span>
+              <span class="check"><span class="box on"><i data-i="check"></i></span>HT</span>
+              <span class="check"><span class="box on"><i data-i="check"></i></span>DLP</span>
+              <span class="check"><span class="box"></span>CKD (ระบุ stage)</span>
+              <span class="check"><span class="box on"><i data-i="check"></i></span>สูบบุหรี่</span>
+              <span class="check"><span class="box"></span>Prior MI / PCI / CABG</span>
+              <span class="check"><span class="box"></span>Stroke / TIA</span>
+              <span class="check"><span class="box"></span>AF</span>
+              <span class="check"><span class="box"></span>Heart failure</span>
+              <span class="check"><span class="box"></span>COPD / Asthma</span>
+              <span class="check"><span class="box"></span>อื่น ๆ …</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="card card-b stack" style="gap:14px">
+        <div class="row" style="gap:14px">
+          <div class="ring"><span class="num">68%</span></div>
+          <div><div class="b">ความครบถ้วนของข้อมูล</div><div class="small muted">ต้องครบ 100% ก่อนจำหน่าย</div></div>
+        </div>
+        <div class="divider"></div>
+        <div class="req-list">
+          <div class="ok"><i data-i="checkcircle" data-s="16"></i>HN / เลขบัตร / ชื่อ-สกุล</div>
+          <div class="ok"><i data-i="checkcircle" data-s="16"></i>สิทธิการรักษา</div>
+          <div class="ok"><i data-i="checkcircle" data-s="16"></i>AN / วันเวลา Admit / เตียง</div>
+          <div class="ok"><i data-i="checkcircle" data-s="16"></i>Principal Dx</div>
+          <div style="color:var(--danger)"><i data-i="alertcircle" data-s="16"></i>โทรศัพท์ญาติไม่ถูกต้อง</div>
+          <div class="no"><i data-i="clock" data-s="16"></i>ตำบล (ที่อยู่)</div>
+          <div class="no"><i data-i="clock" data-s="16"></i>SK / Time metrics (กรณี STEMI)</div>
+        </div>
+      </div>
+      <div class="card card-b stack" style="gap:8px">
+        <div class="row b small"><i data-i="shield" style="color:var(--primary)"></i>ข้อมูลส่วนบุคคล (PDPA)</div>
+        <div class="xs t2">เลขบัตรประชาชนถูกเข้ารหัสในฐานข้อมูลและแสดงแบบปิดบังบางส่วน การเปิดดูเต็มจะถูกบันทึกใน Audit log</div>
+      </div>
+      <div class="card card-b stack" style="gap:6px">
+        <div class="row b small"><i data-i="history" style="color:var(--muted)"></i>บันทึกร่างอัตโนมัติ</div>
+        <div class="xs muted num">บันทึกล่าสุด 13:31 · โดย พว.ทดสอบ ระบบ</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="assets/shell.js"></script>
+<script src="assets/icons.js"></script>
+</body>
+</html>

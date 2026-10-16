@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Discharge — Mobile</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .warnbox { display: flex; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--danger-bg); border: 1px solid var(--danger-bd); color: var(--danger); font-size: 12.5px; align-items: flex-start; }
+  .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .opt { background: #fff; border: 1px solid var(--border-strong); border-radius: 12px; padding: 10px 11px; display: flex; gap: 9px; align-items: center; font-size: 13.5px; font-weight: 500; }
+  .opt .ic { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex: none; }
+  .opt.on { border: 2px solid var(--primary); background: var(--primary-50); padding: 9px 10px; }
+  .meds { display: flex; flex-wrap: wrap; gap: 6px; }
+  .meds .chip { height: 30px; font-size: 13px; }
+  .sec { font-size: 12.5px; font-weight: 600; color: var(--muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>13:52</span><span class="sys"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:11px"></i></span><span class="battery"><i></i></span></span></div>
+  <div class="appbar">
+    <span class="icon-btn" style="border:0;background:transparent;margin-left:-8px"><i data-i="x" data-s="22"></i></span>
+    <div class="grow"><h1 style="font-size:17px;line-height:1.25">จำหน่าย / ออกจากตึก</h1><div class="xs muted">เตียง 14 · นางสมพร คำดี · AN 6912156</div></div>
+  </div>
+  <div class="m-body" style="padding-bottom:110px;gap:10px">
+    <div class="warnbox"><i data-i="alertcircle" data-s="17"></i><div><b>ข้อมูลยังไม่ครบ 1 รายการ</b><br>ยากลับบ้าน: ยังไม่ระบุ ACEI/ARB หรือเหตุผลที่ไม่ให้</div></div>
+
+    <div class="sec">สถานะการออกจากตึก *</div>
+    <div class="opts">
+      <div class="opt"><span class="ic" style="background:var(--ok-bg);color:var(--ok)"><i data-i="home" data-s="16"></i></span>ทุเลา (กลับบ้าน)</div>
+      <div class="opt on"><span class="ic" style="background:var(--info-bg);color:var(--info)"><i data-i="transfer" data-s="16"></i></span>Refer back</div>
+      <div class="opt"><span class="ic" style="background:var(--violet-bg);color:var(--violet)"><i data-i="bed" data-s="16"></i></span>ย้ายตึก</div>
+      <div class="opt"><span class="ic" style="background:var(--slate-bg);color:var(--slate)"><i data-i="x" data-s="16"></i></span>เสียชีวิต</div>
+    </div>
+
+    <div class="grid g2" style="gap:10px">
+      <div class="field"><span class="label">วันเวลา *</span><div class="input num"><i data-i="calendar"></i>17/10/69 10:00</div></div>
+      <div class="field"><span class="label">โรงพยาบาลปลายทาง *</span><div class="input"><i data-i="building"></i>รพ.บ้านดุง</div></div>
+    </div>
+    <div class="field"><span class="label">สรุปผลการรักษา</span><div class="input textarea small">NSTEMI s/p PCI RCA (DES × 1) สำเร็จ ไม่มีภาวะแทรกซ้อน อาการคงที่ 48 ชม.</div></div>
+
+    <div class="sec">ยากลับบ้าน (ตัวชี้วัดคุณภาพ)</div>
+    <div class="meds">
+      <span class="chip primary"><i data-i="check"></i>Aspirin</span>
+      <span class="chip primary"><i data-i="check"></i>P2Y12 inhibitor</span>
+      <span class="chip primary"><i data-i="check"></i>High-intensity statin</span>
+      <span class="chip primary"><i data-i="check"></i>Beta-blocker</span>
+      <span class="chip danger">ACEI / ARB ?</span>
+      <span class="chip">SGLT2i</span>
+    </div>
+    <div class="field"><span class="label">นัดติดตาม</span><div class="input num"><i data-i="calendar"></i>OPD หัวใจ · 14/11/2569</div></div>
+  </div>
+  <div class="sticky-foot">
+    <span class="btn lg primary block" style="opacity:.55"><i data-i="check"></i>ยืนยันการจำหน่าย</span>
+  </div>
+  <div class="home-ind"></div>
+</div>
+<script src="assets/icons.js"></script>
+</body>
+</html>

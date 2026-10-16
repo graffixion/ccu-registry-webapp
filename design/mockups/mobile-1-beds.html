@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bed board — Mobile</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .filters { display: flex; gap: 8px; overflow: hidden; }
+  .filters .chip { height: 32px; font-size: 13px; padding: 0 12px; flex: none; }
+  .filters .chip.on { background: var(--text); color: #fff; border-color: var(--text); }
+  .banner { display: flex; gap: 10px; align-items: center; padding: 11px 12px; border-radius: 12px; background: var(--warn-bg); border: 1px solid var(--warn-bd); }
+  .banner .i { color: var(--warn); }
+  .pcard { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 12px; display: flex; gap: 12px; }
+  .pcard.crit { box-shadow: inset 4px 0 0 var(--danger); }
+  .pcard.attn { box-shadow: inset 4px 0 0 #d98a0b; }
+  .bedno { width: 44px; height: 44px; border-radius: 12px; background: var(--slate-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; flex: none; line-height: 1.1; }
+  .bedno small { font-size: 10px; color: var(--muted); }
+  .bedno b { font-size: 17px; }
+  .pcard .nm { font-weight: 600; font-size: 15px; }
+  .devs { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>13:33</span><span class="sys"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:11px"></i></span><span class="battery"><i></i></span></span></div>
+  <div class="appbar">
+    <div class="logo" style="width:36px;height:36px;border-radius:10px"><i data-i="heartpulse" data-s="20"></i></div>
+    <div class="grow"><h1 style="font-size:18px;line-height:1.2">ตึกหัวใจฯ</h1><div class="xs muted">14/16 เตียง · เวรเช้า · ศ. 16 ต.ค.</div></div>
+    <span class="icon-btn"><i data-i="bell"></i><span class="badge">4</span></span>
+  </div>
+  <div class="m-body">
+    <div class="search" style="max-width:none;background:#fff;flex:none"><i data-i="search"></i>ค้นหา HN / AN / ชื่อ</div>
+    <div class="filters">
+      <span class="chip on">ทั้งหมด 14</span><span class="chip">แจ้งเตือน 4</span><span class="chip">มีอุปกรณ์ 7</span><span class="chip">รอจำหน่าย 2</span>
+    </div>
+    <div class="banner">
+      <i data-i="timer" data-s="22"></i>
+      <div class="grow"><div class="b small">เตียง 3 · TR-band ปล่อยลม</div><div class="xs t2">อีก 12 นาที (13:45) · ปล่อย 3 ml</div></div>
+      <span class="btn sm primary">บันทึก</span>
+    </div>
+    <div id="list" class="stack" style="gap:10px"></div>
+  </div>
+  <nav class="bottomnav">
+    <a class="on"><i data-i="grid"></i>หน้าหลัก</a>
+    <a><i data-i="clipboard"></i>ทะเบียน</a>
+    <a><span class="fab"><i data-i="plus"></i></span></a>
+    <a><i data-i="chart"></i>รายงาน</a>
+    <a><i data-i="user"></i>ฉัน</a>
+  </nav>
+  <div class="home-ind"></div>
+</div>
+<script>
+  // Mockup data — fictional patients
+  const list = [
+    [1, 'นายสมชาย ใจดี', 'ช 68 · HN 0123456 · D3', 'Anterior STEMI · s/p SK', 'crit', [['violet', 'wind', 'ETT D2'], ['info', 'syringe', 'Sheath Rt FV']]],
+    [2, 'นางบุญมี ทดสอบ', 'ญ 74 · HN 0198765 · D2', 'NSTEMI · รอ CAG', '', []],
+    [3, 'นายประเสริฐ สุขใจ', 'ช 59 · HN 0234567 · D1', 'Inferior STEMI · Rescue PCI', 'attn', [['warn', 'timer', 'TR-band 12 นาที']]],
+    [4, 'นางสาวมาลี ศรีสุข', 'ญ 45 · HN 0345678 · D1', 'Unstable angina · s/p CAG', '', [['slate', 'timer', 'TR-band 02:10']]],
+    [5, 'นายทองดี มั่นคง', 'ช 81 · HN 0456789 · D4', 'Complete heart block', '', [['info', 'activity', 'TPM Rt FV']]],
+  ];
+  document.getElementById('list').innerHTML = list.map(([n, nm, meta, dx, k, dev]) => `
+    <div class="pcard ${k}">
+      <div class="bedno"><small>เตียง</small><b class="num">${n}</b></div>
+      <div class="grow">
+        <div class="row between"><span class="nm ellipsis">${nm}</span><i data-i="right" style="color:var(--muted)"></i></div>
+        <div class="xs muted num">${meta}</div>
+        <div class="small">${dx}</div>
+        ${dev.length ? `<div class="devs">${dev.map(([c, ic, t]) => `<span class="chip ${c}"><i data-i="${ic}"></i>${t}</span>`).join('')}</div>` : ''}
+      </div>
+    </div>`).join('');
+</script>
+<script src="assets/icons.js"></script>
+</body>
+</html>

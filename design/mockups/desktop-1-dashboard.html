@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Bed board — Desktop</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .alerts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 14px 16px 16px; }
+  .alert { border: 1px solid var(--border); border-left: 4px solid; border-radius: 10px; padding: 11px 12px; display: flex; flex-direction: column; gap: 4px; background: #fff; }
+  .alert .ttl { display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 13.5px; }
+  .alert .ttl .i { width: 16px; height: 16px; }
+  .alert .desc { font-size: 12.5px; color: var(--text-2); }
+  .alert .foot { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+  .alert.warn { border-left-color: #d98a0b; } .alert.warn .ttl .i { color: var(--warn); }
+  .alert.danger { border-left-color: var(--danger); } .alert.danger .ttl .i { color: var(--danger); }
+  .alert.violet { border-left-color: var(--violet); } .alert.violet .ttl .i { color: var(--violet); }
+  .alert.slate { border-left-color: #64748b; } .alert.slate .ttl .i { color: var(--slate); }
+
+  .beds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px; }
+  .bed { border: 1px solid var(--border); border-radius: 12px; padding: 12px 13px; display: flex; flex-direction: column; gap: 6px; min-height: 164px; background: #fff; position: relative; }
+  .bed.crit { border-color: var(--danger-bd); box-shadow: inset 4px 0 0 var(--danger); }
+  .bed.attn { box-shadow: inset 4px 0 0 #d98a0b; }
+  .bed-no { font-size: 12px; font-weight: 700; background: var(--slate-bg); color: var(--slate); border-radius: 6px; padding: 1px 8px; }
+  .bed .nm { font-weight: 600; font-size: 14.5px; }
+  .bed .meta { font-size: 12px; color: var(--muted); }
+  .bed .dx { font-size: 13px; color: var(--text); }
+  .bed .devs { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; padding-top: 6px; border-top: 1px dashed var(--border); }
+  .bed.empty { border: 1.5px dashed var(--border-strong); background: var(--surface-2); align-items: center; justify-content: center; color: var(--muted); gap: 8px; }
+  .day { font-size: 12px; font-weight: 600; color: var(--primary-700); background: var(--primary-50); border-radius: 6px; padding: 1px 7px; }
+</style>
+</head>
+<body style="width:1440px">
+<div data-shell="dashboard">
+  <div class="page-h">
+    <div>
+      <h1>ภาพรวมตึก (Bed board)</h1>
+      <p>ผู้ป่วยที่อยู่ในตึกขณะนี้ · อัปเดตอัตโนมัติทุก 30 วินาที</p>
+    </div>
+    <div class="row">
+      <span class="btn"><i data-i="printer"></i>พิมพ์ Census ประจำเวร</span>
+      <span class="btn primary"><i data-i="userplus"></i>รับผู้ป่วยใหม่ (Admit)</span>
+    </div>
+  </div>
+
+  <div class="tiles">
+    <div class="card tile">
+      <div class="lbl"><i data-i="bed"></i>ผู้ป่วยในตึก</div>
+      <div class="val num">14 <small>/ 16 เตียง</small></div>
+      <div class="meter"><i style="width:87.5%"></i></div>
+      <div class="sub">อัตราครองเตียง 87.5% · ว่าง 2 เตียง</div>
+    </div>
+    <div class="card tile">
+      <div class="lbl"><i data-i="userplus"></i>รับใหม่วันนี้</div>
+      <div class="val num">3</div>
+      <div class="sub">ER 2 · Refer-in 1</div>
+    </div>
+    <div class="card tile">
+      <div class="lbl"><i data-i="logout"></i>ออกจากตึกวันนี้</div>
+      <div class="val num">2</div>
+      <div class="sub">ทุเลา 1 · Refer back 1</div>
+    </div>
+    <div class="card tile">
+      <div class="lbl"><i data-i="activity"></i>หัตถการวันนี้</div>
+      <div class="val num">5</div>
+      <div class="sub">CAG 2 · PCI 2 · TPM 1</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">
+      <h3><i data-i="bell"></i>การแจ้งเตือนที่ต้องดำเนินการ <span class="badge">4</span></h3>
+      <span class="btn ghost sm">ดูทั้งหมด<i data-i="right"></i></span>
+    </div>
+    <div class="alerts">
+      <div class="alert warn">
+        <div class="ttl"><i data-i="timer"></i>เตียง 3 · TR-band ถึงเวลาปล่อยลม</div>
+        <div class="desc">ปล่อยลม 3 ml (เหลือ 12 ml) ตามแนวทางของตึก</div>
+        <div class="foot"><span class="chip warn">อีก 12 นาที · 13:45</span><span class="btn sm soft">บันทึก</span></div>
+      </div>
+      <div class="alert danger">
+        <div class="ttl"><i data-i="alert"></i>เตียง 7 · Sheath Rt FA ครบ 4 ชม.</div>
+        <div class="desc">ตรวจ ACT ก่อนถอด Sheath (7 Fr)</div>
+        <div class="foot"><span class="chip danger">เลยกำหนด 18 นาที</span><span class="btn sm soft">บันทึก</span></div>
+      </div>
+      <div class="alert violet">
+        <div class="ttl"><i data-i="wind"></i>เตียง 1 · ETT วันที่ 2</div>
+        <div class="desc">ประเมิน Weaning (SAT/SBT) ประจำวัน</div>
+        <div class="foot"><span class="chip violet">ครบกำหนดเวรนี้</span><span class="btn sm soft">บันทึก</span></div>
+      </div>
+      <div class="alert slate">
+        <div class="ttl"><i data-i="file"></i>เตียง 8 · ข้อมูลไม่ครบก่อนจำหน่าย</div>
+        <div class="desc">ขาด: ยากลับบ้าน, LVEF, นัดติดตาม</div>
+        <div class="foot"><span class="chip slate">ความครบถ้วน 78%</span><span class="btn sm soft">เติมข้อมูล</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">
+      <div class="seg" style="font-size:13px">
+        <span class="on">ทั้งหมด 16</span><span>มีผู้ป่วย 14</span><span>มีอุปกรณ์ 7</span><span>รอจำหน่าย 2</span><span>ว่าง 2</span>
+      </div>
+      <div class="row">
+        <span class="small muted">เรียงตาม</span><span class="btn sm">หมายเลขเตียง<i data-i="down"></i></span>
+        <div class="seg"><span class="on" style="padding:0 10px"><i data-i="grid"></i></span><span style="padding:0 10px"><i data-i="list"></i></span></div>
+      </div>
+    </div>
+    <div class="beds" id="beds"></div>
+  </div>
+</div>
+
+<script>
+  // Mockup data — fictional patients
+  const beds = [
+    { n: 1, nm: 'นายสมชาย ใจดี', s: 'ช', a: 68, hn: '0123456', dx: 'Anterior STEMI · s/p SK', d: 3, crit: 1, dev: [['violet', 'wind', 'ETT D2'], ['info', 'syringe', 'Sheath Rt FV 6Fr']] },
+    { n: 2, nm: 'นางบุญมี ทดสอบ', s: 'ญ', a: 74, hn: '0198765', dx: 'NSTEMI · รอ CAG', d: 2, dev: [] },
+    { n: 3, nm: 'นายประเสริฐ สุขใจ', s: 'ช', a: 59, hn: '0234567', dx: 'Inferior STEMI · Rescue PCI', d: 1, attn: 1, dev: [['warn', 'timer', 'TR-band ปล่อยลมใน 12 นาที']] },
+    { n: 4, nm: 'นางสาวมาลี ศรีสุข', s: 'ญ', a: 45, hn: '0345678', dx: 'Unstable angina · s/p CAG', d: 1, dev: [['slate', 'timer', 'TR-band 02:10 ชม.']] },
+    { n: 5, nm: 'นายทองดี มั่นคง', s: 'ช', a: 81, hn: '0456789', dx: 'Complete heart block', d: 4, dev: [['info', 'activity', 'TPM Rt FV · รอ PPM']] },
+    { empty: 1, n: 6 },
+    { n: 7, nm: 'นายวิชัย ดีงาม', s: 'ช', a: 63, hn: '0567891', dx: 'Inferior STEMI + RV infarct', d: 2, crit: 1, dev: [['danger', 'alert', 'Sheath Rt FA 7Fr · ครบ 4 ชม.']] },
+    { n: 8, nm: 'นางจันทร์เพ็ญ แสงทอง', s: 'ญ', a: 70, hn: '0678912', dx: 'ADHF · LVEF 25%', d: 5, dev: [['ok', 'logout', 'รอจำหน่าย (ทุเลา)']] },
+    { n: 9, nm: 'นายสุรชัย พึ่งบุญ', s: 'ช', a: 55, hn: '0789123', dx: 'NSTEMI · s/p PCI LCx', d: 2, dev: [] },
+    { n: 10, nm: 'นางคำปุน ใจงาม', s: 'ญ', a: 77, hn: '0891234', dx: 'AF with RVR', d: 3, dev: [] },
+    { empty: 1, n: 11 },
+    { n: 12, nm: 'นายบุญเลิศ ทองคำ', s: 'ช', a: 66, hn: '0912345', dx: 'Cardiogenic shock · Ant. STEMI', d: 2, crit: 1, dev: [['violet', 'wind', 'ETT D2'], ['info', 'activity', 'IABP 1:1']] },
+    { n: 13, nm: 'นายอำนาจ ศรีวงศ์', s: 'ช', a: 52, hn: '0123987', dx: 'Anterior STEMI · Primary PCI', d: 1, dev: [['slate', 'timer', 'TR-band 00:45 ชม.']] },
+    { n: 14, nm: 'นางสมพร คำดี', s: 'ญ', a: 61, hn: '0234876', dx: 'NSTEMI · s/p PCI RCA', d: 3, dev: [['info', 'transfer', 'Refer back พรุ่งนี้']] },
+    { n: 15, nm: 'นายเกียรติ ชัยมงคล', s: 'ช', a: 49, hn: '0345765', dx: 'VT storm', d: 2, dev: [] },
+    { n: 16, nm: 'นางลำดวน บุญมา', s: 'ญ', a: 83, hn: '0456654', dx: 'Sick sinus syndrome · s/p PPM', d: 2, dev: [] },
+  ];
+  document.getElementById('beds').innerHTML = beds.map((b) => b.empty
+    ? `<div class="bed empty"><span class="bed-no">เตียง ${b.n}</span><span class="small">เตียงว่าง</span><span class="btn sm soft"><i data-i="plus"></i>รับผู้ป่วย</span></div>`
+    : `<div class="bed ${b.crit ? 'crit' : ''} ${b.attn ? 'attn' : ''}">
+        <div class="row between"><span class="bed-no">เตียง ${b.n}</span><span class="day num">D${b.d}</span></div>
+        <div class="nm ellipsis">${b.nm}</div>
+        <div class="meta num">${b.s} ${b.a} ปี · HN ${b.hn}</div>
+        <div class="dx ellipsis">${b.dx}</div>
+        <div class="devs">${b.dev.length ? b.dev.map(([k, ic, t]) => `<span class="chip ${k}"><i data-i="${ic}"></i>${t}</span>`).join('') : '<span class="xs muted">ไม่มีอุปกรณ์ที่ต้องติดตาม</span>'}</div>
+      </div>`).join('');
+</script>
+<script src="assets/shell.js"></script>
+<script src="assets/icons.js"></script>
+</body>
+</html>

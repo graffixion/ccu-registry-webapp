@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Patient registry — Desktop</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .filters { display: flex; gap: 10px; align-items: flex-end; padding: 14px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .filters .field { width: 150px; }
+  .filters .field.wide { width: 220px; }
+  .sum { display: flex; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+  .cmp { display: flex; align-items: center; gap: 8px; }
+  .cmp .bar { width: 54px; height: 5px; border-radius: 9px; background: var(--slate-bg); overflow: hidden; }
+  .cmp .bar i { display: block; height: 100%; border-radius: 9px; background: var(--primary); }
+  .cmp .bar i.lo { background: #d98a0b; }
+  .pager { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid var(--border); }
+  .pg { display: flex; gap: 4px; }
+  .pg span { min-width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-2); background: #fff; }
+  .pg span.on { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .sub2 { font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body style="width:1440px">
+<div data-shell="registry">
+  <div class="page-h">
+    <div>
+      <h1>ทะเบียนผู้ป่วย</h1>
+      <p>รายการ Admission ทั้งหมดของตึก — 1 แถว = 1 ครั้งที่รับไว้ (AN)</p>
+    </div>
+    <div class="row">
+      <span class="btn"><i data-i="download"></i>ส่งออก Excel</span>
+      <span class="btn primary"><i data-i="userplus"></i>รับผู้ป่วยใหม่ (Admit)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="filters">
+      <div class="field wide"><span class="label">ค้นหา</span><div class="input ph"><i data-i="search"></i>HN, AN, ชื่อ, เลขบัตร</div></div>
+      <div class="field wide"><span class="label">ช่วงวันที่ Admit</span><div class="input"><i data-i="calendar"></i>1 ต.ค. 2569 – 16 ต.ค. 2569</div></div>
+      <div class="field"><span class="label">Dx</span><div class="input">ทั้งหมด<span class="end"><i data-i="down"></i></span></div></div>
+      <div class="field"><span class="label">หัตถการ</span><div class="input">ทั้งหมด<span class="end"><i data-i="down"></i></span></div></div>
+      <div class="field"><span class="label">สถานะ</span><div class="input">ทั้งหมด<span class="end"><i data-i="down"></i></span></div></div>
+      <span class="btn ghost"><i data-i="x"></i>ล้างตัวกรอง</span>
+    </div>
+    <div class="sum">
+      <span class="chip lg slate">ทั้งหมด <b class="num">&nbsp;128</b></span>
+      <span class="chip lg primary"><span class="dot"></span>กำลังรักษา <b class="num">&nbsp;14</b></span>
+      <span class="chip lg ok"><i data-i="check"></i>ทุเลา <b class="num">&nbsp;86</b></span>
+      <span class="chip lg info"><i data-i="transfer"></i>Refer back <b class="num">&nbsp;17</b></span>
+      <span class="chip lg violet"><i data-i="bed"></i>ย้ายตึก <b class="num">&nbsp;6</b></span>
+      <span class="chip lg slate"><i data-i="x"></i>เสียชีวิต <b class="num">&nbsp;5</b></span>
+    </div>
+    <table class="tbl">
+      <thead>
+        <tr><th>HN / AN</th><th>ชื่อ-สกุล</th><th>Dx หลัก</th><th>หัตถการ</th><th>Admit</th><th>ออกจากตึก</th><th>LOS</th><th>สถานะ</th><th>ความครบถ้วน</th><th></th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="pager">
+      <span class="small muted">แสดง 1–12 จาก 128 รายการ</span>
+      <div class="pg"><span><i data-i="left" data-s="15"></i></span><span class="on">1</span><span>2</span><span>3</span><span>…</span><span>11</span><span><i data-i="right" data-s="15"></i></span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Mockup data — fictional patients
+  const S = {
+    active: '<span class="chip primary"><span class="dot"></span>กำลังรักษา</span>',
+    ok: '<span class="chip ok"><i data-i="check"></i>ทุเลา</span>',
+    refer: (h) => `<div class="stack" style="gap:2px"><span class="chip info"><i data-i="transfer"></i>Refer back</span><span class="sub2">${h}</span></div>`,
+    move: (w) => `<div class="stack" style="gap:2px"><span class="chip violet"><i data-i="bed"></i>ย้ายตึก</span><span class="sub2">${w}</span></div>`,
+    dead: '<span class="chip slate"><i data-i="x"></i>เสียชีวิต</span>',
+  };
+  const rows = [
+    ['0123987', '6912345', 'นายอำนาจ ศรีวงศ์', 'ช 52', 'Anterior STEMI', 'Primary PCI', '16/10/69', '–', '1', S.active, 72],
+    ['0234567', '6912310', 'นายประเสริฐ สุขใจ', 'ช 59', 'Inferior STEMI', 'SK → Rescue PCI', '16/10/69', '–', '1', S.active, 88],
+    ['0345678', '6912288', 'นางสาวมาลี ศรีสุข', 'ญ 45', 'Unstable angina', 'CAG', '16/10/69', '–', '1', S.active, 80],
+    ['0567812', '6912104', 'นายสมหวัง แก้วมณี', 'ช 72', 'NSTEMI', 'CAG + PCI', '12/10/69', '16/10/69', '4', S.ok, 100],
+    ['0678123', '6912087', 'นางทองใบ ศรีสวัสดิ์', 'ญ 66', 'NSTEMI', 'CAG', '11/10/69', '16/10/69', '5', S.refer('รพ.หนองหาน'), 100],
+    ['0912345', '6912201', 'นายบุญเลิศ ทองคำ', 'ช 66', 'Cardiogenic shock', 'Primary PCI, IABP', '14/10/69', '–', '2', S.active, 64],
+    ['0789234', '6911990', 'นายสมบัติ ใจกล้า', 'ช 79', 'Anterior STEMI', 'SK', '10/10/69', '11/10/69', '1', S.dead, 96],
+    ['0891345', '6911942', 'นางสายทอง พรมมา', 'ญ 58', 'ADHF', '–', '9/10/69', '13/10/69', '4', S.move('อายุรกรรมหญิง 2'), 100],
+    ['0456789', '6912098', 'นายทองดี มั่นคง', 'ช 81', 'Complete heart block', 'TPM → PPM', '12/10/69', '–', '4', S.active, 76],
+    ['0912456', '6911876', 'นายชาญ ศรีบุญ', 'ช 61', 'Inferior STEMI', 'SK, Rescue PCI', '8/10/69', '12/10/69', '4', S.refer('รพ.กุมภวาปี'), 100],
+    ['0123567', '6911801', 'นางคำแพง มีสุข', 'ญ 69', 'AF with RVR', 'DC cardioversion', '7/10/69', '10/10/69', '3', S.ok, 92],
+    ['0234678', '6911755', 'นายวีระ บุญยืน', 'ช 47', 'NSTEMI', 'CAG + PCI', '6/10/69', '9/10/69', '3', S.ok, 100],
+  ];
+  document.getElementById('rows').innerHTML = rows.map(([hn, an, nm, sa, dx, px, ad, dc, los, st, pct]) => `
+    <tr>
+      <td class="num"><div class="b">${hn}</div><div class="sub2">AN ${an}</div></td>
+      <td><div class="name">${nm}</div><div class="sub2">${sa} ปี</div></td>
+      <td>${dx}</td>
+      <td class="t2">${px}</td>
+      <td class="num">${ad}</td>
+      <td class="num">${dc}</td>
+      <td class="num">${los} วัน</td>
+      <td>${st}</td>
+      <td><div class="cmp"><div class="bar"><i class="${pct < 80 ? 'lo' : ''}" style="width:${pct}%"></i></div><span class="small num ${pct < 80 ? '' : 'muted'}">${pct}%</span></div></td>
+      <td><span class="icon-btn" style="width:30px;height:30px;border:0"><i data-i="morev"></i></span></td>
+    </tr>`).join('');
+</script>
+<script src="assets/shell.js"></script>
+<script src="assets/icons.js"></script>
+</body>
+</html>

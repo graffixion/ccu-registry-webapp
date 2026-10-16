@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TR-band log — Mobile</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .sum { background: #fff; border: 1px solid var(--border); border-radius: 16px; display: grid; grid-template-columns: repeat(3, 1fr); }
+  .sum div { padding: 11px 12px; border-right: 1px solid var(--border); }
+  .sum div:last-child { border-right: 0; }
+  .sum small { display: block; font-size: 11px; color: var(--muted); }
+  .sum b { font-size: 16px; }
+  .log { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 14px; }
+  .step { display: flex; gap: 12px; position: relative; padding-bottom: 12px; }
+  .step:last-child { padding-bottom: 0; }
+  .step::before { content: ""; position: absolute; left: 10px; top: 22px; bottom: 0; width: 1.5px; background: var(--border); }
+  .step:last-child::before { display: none; }
+  .mk { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border-strong); background: #fff; flex: none; display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; }
+  .mk.done { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .mk.now { border: 2px solid #d98a0b; box-shadow: 0 0 0 4px var(--warn-bg); }
+  .mk.now::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #d98a0b; }
+  .entry { background: #fffcf4; border: 1px solid var(--warn-bd); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+  .stepper { display: flex; align-items: center; border: 1px solid var(--border-strong); border-radius: 10px; background: #fff; overflow: hidden; height: 42px; }
+  .stepper span { width: 42px; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--primary-700); background: var(--surface-2); }
+  .stepper b { flex: 1; text-align: center; font-size: 16px; }
+  .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 8px; }
+  .checks .check { font-size: 13px; white-space: normal; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>13:44</span><span class="sys"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:11px"></i></span><span class="battery"><i></i></span></span></div>
+  <div class="appbar">
+    <span class="icon-btn" style="border:0;background:transparent;margin-left:-8px"><i data-i="back" data-s="22"></i></span>
+    <div class="grow"><h1 style="font-size:17px;line-height:1.25">บันทึก TR-band</h1><div class="xs muted">เตียง 3 · นายประเสริฐ สุขใจ</div></div>
+  </div>
+  <div class="m-body" style="padding-bottom:110px">
+    <div class="sum num">
+      <div><small>ตำแหน่ง</small><b>Rt radial</b></div>
+      <div><small>ใส่เมื่อ</small><b>11:40</b></div>
+      <div><small>ลมคงเหลือ</small><b>15 ml</b></div>
+    </div>
+
+    <div class="log">
+      <div class="row between" style="margin-bottom:12px"><span class="b">แผนการปล่อยลม</span><span class="xs muted">แนวทางของตึก · ตั้งค่าได้</span></div>
+      <div class="step"><span class="mk done"><i data-i="check" data-s="13" style="stroke-width:3"></i></span><div class="grow"><div class="small b num">11:40 · ใส่ TR-band 15 ml</div><div class="xs muted">พว.ทดสอบ ระบบ · ใน Cath lab</div></div></div>
+      <div class="step">
+        <span class="mk now"></span>
+        <div class="grow">
+          <div class="small b num">13:45 · ปล่อยลม 3 ml → เหลือ 12 ml</div>
+          <div class="entry">
+            <div class="grid g2" style="gap:10px">
+              <div class="field"><span class="label">เวลา</span><div class="input num"><i data-i="clock"></i>13:44</div></div>
+              <div class="field"><span class="label">ปล่อยลม</span><div class="stepper num"><span>−</span><b>3 ml</b><span>+</span></div></div>
+            </div>
+            <div class="checks">
+              <span class="check"><span class="box on"><i data-i="check"></i></span>ไม่มีเลือดซึม</span>
+              <span class="check"><span class="box on"><i data-i="check"></i></span>ไม่มี Hematoma</span>
+              <span class="check"><span class="box on"><i data-i="check"></i></span>คลำ Radial pulse ได้</span>
+              <span class="check"><span class="box on"><i data-i="check"></i></span>ปลายมือสี/อุณหภูมิปกติ</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step"><span class="mk"></span><div class="grow"><div class="small t2 num">14:00 · ปล่อยลม 3 ml → 9 ml</div></div></div>
+      <div class="step"><span class="mk"></span><div class="grow"><div class="small t2 num">14:15 · ปล่อยลม 3 ml → 6 ml</div></div></div>
+      <div class="step"><span class="mk"></span><div class="grow"><div class="small t2 num">14:30 · ปล่อยลม 3 ml → 3 ml</div></div></div>
+      <div class="step"><span class="mk"></span><div class="grow"><div class="small t2 num">14:45 · ปล่อยลมหมด → ถอด TR-band</div></div></div>
+    </div>
+  </div>
+  <div class="sticky-foot">
+    <span class="btn lg danger" style="flex:1"><i data-i="alert"></i>พบปัญหา</span>
+    <span class="btn lg primary" style="flex:1.6"><i data-i="check"></i>บันทึกปล่อยลม</span>
+  </div>
+  <div class="home-ind"></div>
+</div>
+<script src="assets/icons.js"></script>
+</body>
+</html>
