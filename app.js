@@ -250,7 +250,7 @@ function shell(activeKey, mTitle, content) {
         ${can('patients') ? `<div class="gs hide-m">${ic('search')}<input id="gs" autocomplete="off" placeholder="ค้นหา HN / AN / ชื่อ-สกุล / เลขบัตรประชาชน   ( / )"><div class="sugg hidden" id="sugg"></div></div>` : ''}
         <div class="grow hide-m"></div>
         <span class="chip primary lg hide-m">${ic('bed', 14)}ตึกหัวใจและหลอดเลือด</span>
-        <span class="clock num hide-m" data-act="tick" title="เวลาจำลอง — คลิกเพื่อเดินเวลา +15 นาที">${ic('clock', 14)}${DOW[d.getDay()]} ${fdl(S.now)} · ${ft(S.now)} · ${shift} ${ic('fastfwd', 12)}</span>
+        <span class="clock num hide-m" data-act="tick" title="เวลาจำลอง — คลิกเพื่อเดินเวลา +15 นาที">${ic('clock', 14)}${DOW[d.getDay()]} ${fdl(S.now)} · ${ft(S.now)} · ${shift} ${ic('right', 12)}</span>
         ${can('notifications') ? `<span class="icon-btn" data-go="#/notifications">${ic('bell')}${n ? `<span class="badge">${n}</span>` : ''}</span>` : ''}
       </header>
       <div class="content">${content}</div>
@@ -310,7 +310,7 @@ P.beds = (q) => {
   <div class="tiles" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr))">
     <div class="card tile"><div class="lbl">${ic('bed', 16)}อัตราครองเตียง (Occupancy)</div><div class="val num">${wm.currentBor}% <small>(${occ}/${S.master.bedCount} เตียง)</small></div><div class="meter"><i style="width:${wm.currentBor}%"></i></div><div class="sub">ว่าง ${S.master.bedCount - occ} เตียง · เฉลี่ย ต.ค. ${wm.periodBor}%</div></div>
     <div class="card tile"><div class="lbl">${ic('clock', 16)}วันนอนเฉลี่ย (LOS)</div><div class="val num">${wm.avgLosOut} <small>วัน</small></div><div class="sub">สะสม ${wm.totalPatientDays} วันนอน · ทั้งหมดเฉลี่ย ${wm.avgLosAll} วัน</div></div>
-    <div class="card tile"><div class="lbl">${ic('refresh', 16)}อัตราหมุนเวียนเตียง (BTR)</div><div class="val num">${wm.btr} <small>ราย/เตียง</small></div><div class="sub">รวมรับใหม่ ${wm.btrAll} ราย/เตียง · จำหน่าย ${wm.disCount} ราย</div></div>
+    <div class="card tile"><div class="lbl">${ic('transfer', 16)}อัตราหมุนเวียนเตียง (BTR)</div><div class="val num">${wm.btr} <small>ราย/เตียง</small></div><div class="sub">รวมรับใหม่ ${wm.btrAll} ราย/เตียง · จำหน่าย ${wm.disCount} ราย</div></div>
     <div class="card tile"><div class="lbl">${ic('heartpulse', 16)}อัตราตาย (Mortality)</div><div class="val num">${wm.mortRateOut}% <small>(${wm.dead} ราย)</small></div><div class="sub">เทียบทั้งหมด ${wm.mortRateAll}% · STEMI ${wm.stemiMortRate}%</div></div>
     <div class="card tile"><div class="lbl">${ic('userplus', 16)}รับใหม่ / จำหน่ายวันนี้</div><div class="val num">+${admToday.length} <small>/ -${outToday.length} ราย</small></div><div class="sub">หัตถการวันนี้ ${pxToday.length} ครั้ง (${cnt(pxToday, (p) => p.type)})</div></div>
   </div>
@@ -677,7 +677,7 @@ P.dashboard = (q) => {
         <div class="xs muted formula">สูตร: Σ วันนอน ÷ จำนวนผู้ป่วย (${m.totalPatientDays} ÷ ${m.total || 1})</div>
       </div>
       <div class="metric kpi-box">
-        <div class="lbl">${ic('refresh', 16)}อัตราหมุนเวียนเตียง (Bed Turnover Rate)</div>
+        <div class="lbl">${ic('transfer', 16)}อัตราหมุนเวียนเตียง (Bed Turnover Rate)</div>
         <div class="val num">${m.btr} <small>ราย/เตียง</small></div>
         <div class="sub">คิดรวมผู้ป่วยรับทั้งหมด <b>${m.btrAll} ราย/เตียง</b> · ระยะว่างเตียง (TOI) ${m.toi} วัน</div>
         <div class="xs muted formula">สูตร: จำนวนจำหน่าย ÷ จำนวนเตียง (${m.disCount} ÷ ${m.bedCount})</div>
@@ -861,7 +861,7 @@ P.master = (q) => {
 P.users = () => `<div class="page-h"><div><h1>ผู้ใช้งานและสิทธิ์</h1><p>บัญชีผู้ใช้ภายในโรงพยาบาล · ห้ามใช้บัญชีร่วมกัน</p></div><button class="btn primary" data-act="addUser">${ic('userplus')}เพิ่มผู้ใช้</button></div>
   <div class="card"><div class="tbl-wrap"><table class="tbl mcards"><thead><tr><th>ชื่อผู้ใช้</th><th>ชื่อ-สกุล</th><th>ตำแหน่ง</th><th>บทบาท</th><th>เข้าระบบล่าสุด</th><th>สถานะ</th><th></th></tr></thead><tbody>
   ${S.users.map((u) => `<tr><td class="mono">${u.username}</td><td class="b mfull">${u.name}</td><td class="t2">${u.position}</td><td><span class="chip primary">${ROLES[u.role].label}</span></td><td class="num">${fdt(u.last)}</td><td>${u.active ? '<span class="chip ok">ใช้งาน</span>' : '<span class="chip">ระงับ</span>'}</td>
-    <td class="r"><div class="row" style="justify-content:flex-end;gap:6px"><button class="btn sm" data-act="resetPw" data-id="${u.id}" title="รีเซ็ตรหัสผ่าน">${ic('key', 15)}</button><button class="btn sm" data-act="toggleUser" data-id="${u.id}">${u.active ? 'ระงับ' : 'เปิดใช้'}</button></div></td></tr>`).join('')}</tbody></table></div></div>
+    <td class="r"><div class="row" style="justify-content:flex-end;gap:6px"><button class="btn sm" data-act="resetPw" data-id="${u.id}" title="รีเซ็ตรหัสผ่าน">${ic('lock', 15)}</button><button class="btn sm" data-act="toggleUser" data-id="${u.id}">${u.active ? 'ระงับ' : 'เปิดใช้'}</button></div></td></tr>`).join('')}</tbody></table></div></div>
   ${card('ตารางสิทธิ์ตามบทบาท', 'shield', `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>หน้า</th>${Object.values(ROLES).map((r) => `<th class="r">${r.label}</th>`).join('')}</tr></thead><tbody>${NAV.filter((x) => x[0] !== 'sec').map((x) => `<tr><td>${x[3]}</td>${Object.values(ROLES).map((r) => `<td class="r">${r.pages.includes(x[0]) ? ic('check', 16, 'color:var(--ok)') : '<span class="muted">–</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`)}`;
 
 // ---------- audit
@@ -879,7 +879,7 @@ P.me = () => { const u = user(); return `<div class="page-h"><div><h1>บัญ�
   <div class="cols2">${card('ผู้ใช้', 'user', `<dl class="kv"><dt>ชื่อ</dt><dd>${u.name}</dd><dt>ชื่อผู้ใช้</dt><dd class="mono">${u.username}</dd><dt>ตำแหน่ง</dt><dd>${u.position}</dd><dt>บทบาท</dt><dd>${ROLES[S.role].label}</dd></dl><button class="btn danger" style="margin-top:14px" data-act="logout">${ic('logout')}ออกจากระบบ</button>`)}
   ${card('สลับบทบาท (ทดสอบสิทธิ์)', 'shield', `<div class="opts">${Object.entries(ROLES).map(([k, r]) => `<div class="opt ${S.role === k ? 'on' : ''}" data-act="switchRole" data-role="${k}">${r.label}</div>`).join('')}</div><div class="xs muted" style="margin-top:10px">เมนูและปุ่มจะเปลี่ยนตามตารางสิทธิ์</div>`)}
   ${card('เวลาจำลอง', 'clock', `<div class="row wrap"><span class="b num">${fdl(S.now)} ${ft(S.now)}</span><button class="btn sm" data-act="tick">+15 นาที</button><button class="btn sm" data-act="tick" data-m="60">+1 ชม.</button><button class="btn sm" data-act="resetClock">กลับเป็น 13:33</button></div><div class="xs muted" style="margin-top:8px">ใช้ดูการแจ้งเตือน TR-band / Sheath เปลี่ยนตามเวลา</div>`)}
-  ${card('ข้อมูลตัวอย่าง', 'database', `<div class="small t2">การแก้ไขทั้งหมดถูกเก็บในเบราว์เซอร์นี้เท่านั้น (localStorage)</div><button class="btn" style="margin-top:12px" data-act="resetData">${ic('refresh')}รีเซ็ตข้อมูลตัวอย่าง</button>`)}</div>`; };
+  ${card('ข้อมูลตัวอย่าง', 'database', `<div class="small t2">การแก้ไขทั้งหมดถูกเก็บในเบราว์เซอร์นี้เท่านั้น (localStorage)</div><button class="btn" style="margin-top:12px" data-act="resetData">${ic('history')}รีเซ็ตข้อมูลตัวอย่าง</button>`)}</div>`; };
 
 // ============================================================ router
 function parse() {
@@ -1263,14 +1263,14 @@ render();
         <div class="small"><b>เป้าหมายการพยาบาล (Goals):</b><div class="t2" style="white-space:pre-line;margin-top:2px">${esc((c.goals || '').split('\n').slice(0, 2).join('\n'))}</div></div>
         <div class="xs muted">อัปเดตล่าสุด: ${fdt(c.updatedAt)} · โดย ${esc(c.by || '-')}</div>
       </div>`,
-      `<button class="btn sm primary" data-go="#/adm/${a.an}/care">${ic('edit', 14)}เปิดดู / แก้ไขแผนการพยาบาล</button>`
+      `<button class="btn sm primary" data-go="#/adm/${a.an}/care">${ic('pencil', 14)}เปิดดู / แก้ไขแผนการพยาบาล</button>`
     );
     return origSummary(a, p) + `<div style="margin-top:14px">${careCard}</div>`;
   };
 
   TAB.care = (a, p) => {
     const c = window.ensureAdmCarePlan(a);
-    const ro = !write();
+    const ro = !canEdit();
     const checklist = ND_LIST.map((nd) => {
       const on = (c.codes || []).includes(nd.code);
       return `<label class="opt ${on ? 'on' : ''}" style="align-items:flex-start;gap:10px;padding:10px 12px;cursor:pointer">
@@ -1287,8 +1287,8 @@ render();
         <div class="card-h">
           <h3>${ic('steth')}ข้อวินิจฉัยทางการพยาบาลและแผนการรักษาผู้ป่วยโรคหัวใจ (AN ${a.an} · ${fullName(p)})</h3>
           <div class="row wrap">
-            ${!ro ? `<button class="btn soft sm" data-act="autoCarePlan" data-an="${a.an}">${ic('spark', 14)}วิเคราะห์และแนะนำแผนอัตโนมัติตามคลินิก</button>` : ''}
-            <button class="btn sm" data-go="#/careplan">${ic('book', 14)}ดูคลังมาตรฐาน 10 ข้อวินิจฉัย</button>
+            ${!ro ? `<button class="btn soft sm" data-act="autoCarePlan" data-an="${a.an}">${ic('activity', 14)}วิเคราะห์และแนะนำแผนอัตโนมัติตามคลินิก</button>` : ''}
+            <button class="btn sm" data-go="#/careplan">${ic('file', 14)}ดูคลังมาตรฐาน 10 ข้อวินิจฉัย</button>
             <button class="btn sm" data-act="print">${ic('printer', 14)}พิมพ์แผนการพยาบาล</button>
           </div>
         </div>
