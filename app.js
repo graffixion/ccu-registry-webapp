@@ -1263,14 +1263,14 @@ render();
         <div class="small"><b>เป้าหมายการพยาบาล (Goals):</b><div class="t2" style="white-space:pre-line;margin-top:2px">${esc((c.goals || '').split('\n').slice(0, 2).join('\n'))}</div></div>
         <div class="xs muted">อัปเดตล่าสุด: ${fdt(c.updatedAt)} · โดย ${esc(c.by || '-')}</div>
       </div>`,
-      `<button class="btn sm primary" data-go="#/adm/${a.an}/care">${ic('edit', 14)}เปิดดู / แก้ไขแผนการพยาบาล</button>`
+      `<button class="btn sm primary" data-go="#/adm/${a.an}/care">${ic('pencil', 14)}เปิดดู / แก้ไขแผนการพยาบาล</button>`
     );
     return origSummary(a, p) + `<div style="margin-top:14px">${careCard}</div>`;
   };
 
   TAB.care = (a, p) => {
     const c = window.ensureAdmCarePlan(a);
-    const ro = !write();
+    const ro = !canEdit();
     const checklist = ND_LIST.map((nd) => {
       const on = (c.codes || []).includes(nd.code);
       return `<label class="opt ${on ? 'on' : ''}" style="align-items:flex-start;gap:10px;padding:10px 12px;cursor:pointer">
@@ -1287,8 +1287,8 @@ render();
         <div class="card-h">
           <h3>${ic('steth')}ข้อวินิจฉัยทางการพยาบาลและแผนการรักษาผู้ป่วยโรคหัวใจ (AN ${a.an} · ${fullName(p)})</h3>
           <div class="row wrap">
-            ${!ro ? `<button class="btn soft sm" data-act="autoCarePlan" data-an="${a.an}">${ic('spark', 14)}วิเคราะห์และแนะนำแผนอัตโนมัติตามคลินิก</button>` : ''}
-            <button class="btn sm" data-go="#/careplan">${ic('book', 14)}ดูคลังมาตรฐาน 10 ข้อวินิจฉัย</button>
+            ${!ro ? `<button class="btn soft sm" data-act="autoCarePlan" data-an="${a.an}">${ic('refresh', 14)}วิเคราะห์และแนะนำแผนอัตโนมัติตามคลินิก</button>` : ''}
+            <button class="btn sm" data-go="#/careplan">${ic('file', 14)}ดูคลังมาตรฐาน 10 ข้อวินิจฉัย</button>
             <button class="btn sm" data-act="print">${ic('printer', 14)}พิมพ์แผนการพยาบาล</button>
           </div>
         </div>
@@ -1297,7 +1297,7 @@ render();
             <div class="lbl" style="margin-bottom:6px">1. เลือกข้อวินิจฉัยทางการพยาบาลผู้ป่วยโรคหัวใจ (คลิกเลือกได้มากกว่า 1 ข้อ — ระบบจะดึงแผนมาตรฐานให้อัตโนมัติ)</div>
             <div class="grid g2" style="gap:8px">${checklist}</div>
           </div>
-          ${F('สรุปข้อวินิจฉัยทางการพยาบาล (Nursing Diagnosis Summary)', inp('summary', c.summary || '', { ro }))}
+          ${F('สรุปข้อวินิจฉัยทางการพยาบาล (Nursing Diagnosis Summary)', inp('summary', c.summary || '', { attrs: ro ? 'readonly' : '' }))}
           <div class="grid g2">
             ${F('2. แผนการรักษาของแพทย์ (Medical Treatment Plan & Medication Regimen)', `<textarea class="inp" name="treatmentPlan" rows="6" ${ro ? 'readonly' : ''}>${esc(c.treatmentPlan || '')}</textarea>`)}
             ${F('3. ข้อมูลสนับสนุน & เป้าหมายการพยาบาล (Assessment & Expected Outcomes)', `<textarea class="inp" name="goals" rows="6" ${ro ? 'readonly' : ''}>${esc(c.goals || '')}</textarea>`)}
