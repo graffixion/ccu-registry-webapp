@@ -1181,3 +1181,228 @@ window.addEventListener('error', (e) => { const b = document.getElementById('err
 load();
 if (/[?&]auto=1/.test(location.search) && !S.loggedIn) { S.loggedIn = true; const r = (location.search.match(/role=(\w+)/) || [])[1]; if (ROLES[r]) { S.role = r; S.userId = (S.users.find((u) => u.role === r) || S.users[0]).id; } }
 render();
+
+// ============================================================ Cardiac Nursing Diagnosis & Care Plan Extension
+(function initCardiacCarePlanModule() {
+  const ND_LIST = typeof CARDIAC_NURSING_DIAGNOSES !== 'undefined' ? CARDIAC_NURSING_DIAGNOSES : [];
+  ['nurse', 'head', 'doctor', 'qa'].forEach((r) => {
+    if (ROLES[r] && !ROLES[r].pages.includes('careplan')) ROLES[r].pages.push('careplan');
+  });
+  const procIdx = NAV.findIndex((x) => x[0] === 'procedures');
+  if (procIdx > -1 && !NAV.some((x) => x[0] === 'careplan')) {
+    NAV.splice(procIdx + 1, 0, ['careplan', '#/careplan', 'steth', 'ข้อวินิจฉัย & แผนการพยาบาล']);
+  }
+  if (!TABS.some((x) => x[0] === 'care')) {
+    const devIdx = TABS.findIndex((x) => x[0] === 'dev');
+    TABS.splice(devIdx + 1, 0, ['care', 'แผนการรักษา & พยาบาล']);
+  }
+
+  window.suggestCarePlanForAdm = function(a) {
+    const dxStr = [a.dx?.name, a.dx?.icd, a.dx?.killip, a.dx?.secondary, ...(a.ud || [])].join(' ');
+    const pxStr = (a.px || []).map((p) => p.type + ' ' + (p.access || '')).join(' ');
+    const devStr = (a.dev || []).map((d) => d.type + ' ' + (d.site || '')).join(' ');
+    const compStr = (a.comp || []).map((c) => c.type).join(' ');
+    const skStr = a.sk?.given ? 'SK Streptokinase' : '';
+    const outStr = a.out?.type || '';
+    const all = [dxStr, pxStr, devStr, compStr, skStr, outStr].join(' ');
+
+    const codes = new Set();
+    if (/STEMI|NSTEMI|Angina|I21|I20|PCI|CAG/i.test(all)) codes.add('ND01');
+    if (/Heart failure|CHF|I50|Shock|R57|III|IV|IABP|Cardiomyopathy/i.test(all)) codes.add('ND02');
+    if (/VT|VF|AF|I47|I48|I44|Block|CHB|Sinus|TPM|PPM|AICD|Cardioversion|STEMI/i.test(all)) codes.add('ND03');
+    if (a.sk?.given || /TR-band|Sheath|PCI|CAG|Hematoma|Bleeding/i.test(all)) codes.add('ND04');
+    if (/ETT|HFNC|BiPAP|Pulmonary edema|I50|Shock/i.test(all)) codes.add('ND05');
+    if (/STEMI|NSTEMI|Angina|Dissection|Pericardio/i.test(all)) codes.add('ND06');
+    if (/CAG|PCI|CKD|AKI|CIN/i.test(all) || (a.labs?.egfr && a.labs.egfr < 60)) codes.add('ND07');
+    if (/TPM|PPM|AICD|Sheath|ETT|IABP|Endocarditis/i.test(all)) codes.add('ND08');
+    if (/CAG|PCI|PPM|STEMI/i.test(all)) codes.add('ND09');
+    if (a.status === 'out' || a.dcPending || /ทุเลา|Refer/i.test(outStr)) codes.add('ND10');
+    if (codes.size === 0) { codes.add('ND01'); codes.add('ND10'); }
+
+    const selected = ND_LIST.filter((n) => codes.has(n.code));
+    const tx = [], goals = [], intv = [], evals = [];
+    selected.forEach((n) => {
+      (n.treatmentPlan || []).forEach((t) => { if (!tx.includes('• ' + t)) tx.push('• ' + t); });
+      (n.goals || []).forEach((g) => { if (!goals.includes('• ' + g)) goals.push('• ' + g); });
+      intv.push(`[${n.code}: ${n.title}]`);
+      (n.interventions || []).forEach((iv) => intv.push('  ' + iv));
+      if (n.evaluation) evals.push(`• (${n.code}) ${n.evaluation}`);
+    });
+    return {
+      codes: [...codes],
+      summary: selected.map((n, i) => `${i + 1}. ${n.title}`).join(' | '),
+      treatmentPlan: tx.join('\n'),
+      goals: goals.join('\n'),
+      interventions: intv.join('\n'),
+      evaluation: evals.join('\n'),
+      updatedAt: S?.now || '2026-10-16T13:30',
+      by: 'ระบบแนะนำอัตโนมัติตามคลินิก'
+    };
+  };
+
+  window.ensureAdmCarePlan = function(a) {
+    if (!a.care || !a.care.codes || !a.care.codes.length) {
+      a.care = window.suggestCarePlanForAdm(a);
+    }
+    return a.care;
+  };
+
+  const origSummary = TAB.summary;
+  TAB.summary = (a, p) => {
+    const c = window.ensureAdmCarePlan(a);
+    const ndChips = (c.codes || []).map((code) => {
+      const found = ND_LIST.find((n) => n.code === code);
+      return `<span class="chip primary" style="margin:2px 4px 2px 0">${esc(code)}: ${esc(found ? found.title.split('(')[0].trim() : code)}</span>`;
+    }).join('');
+    const careCard = card(
+      'ข้อวินิจฉัยการพยาบาล & แผนการรักษา (Cardiac Care Plan)',
+      'steth',
+      `<div class="stack" style="gap:8px">
+        <div>${ndChips || '<span class="muted">ยังไม่ได้เลือกข้อวินิจฉัย</span>'}</div>
+        <div class="small"><b>แผนการรักษา (Medical Plan):</b><div class="t2" style="white-space:pre-line;margin-top:2px">${esc((c.treatmentPlan || '').split('\n').slice(0, 3).join('\n'))}</div></div>
+        <div class="small"><b>เป้าหมายการพยาบาล (Goals):</b><div class="t2" style="white-space:pre-line;margin-top:2px">${esc((c.goals || '').split('\n').slice(0, 2).join('\n'))}</div></div>
+        <div class="xs muted">อัปเดตล่าสุด: ${fdt(c.updatedAt)} · โดย ${esc(c.by || '-')}</div>
+      </div>`,
+      `<button class="btn sm primary" data-go="#/adm/${a.an}/care">${ic('edit', 14)}เปิดดู / แก้ไขแผนการพยาบาล</button>`
+    );
+    return origSummary(a, p) + `<div style="margin-top:14px">${careCard}</div>`;
+  };
+
+  TAB.care = (a, p) => {
+    const c = window.ensureAdmCarePlan(a);
+    const ro = !write();
+    const checklist = ND_LIST.map((nd) => {
+      const on = (c.codes || []).includes(nd.code);
+      return `<label class="opt ${on ? 'on' : ''}" style="align-items:flex-start;gap:10px;padding:10px 12px;cursor:pointer">
+        <input type="checkbox" name="ndCode" value="${nd.code}" ${on ? 'checked' : ''} ${ro ? 'disabled' : ''} data-act="toggleNdCode" data-an="${a.an}">
+        <div>
+          <div class="row" style="gap:6px"><span class="chip primary">${nd.code}</span><b class="small">${esc(nd.title)}</b></div>
+          <div class="xs t2" style="margin-top:2px">${esc(nd.cause)}</div>
+        </div>
+      </label>`;
+    }).join('');
+
+    return `<div class="stack" style="gap:14px">
+      <div class="card">
+        <div class="card-h">
+          <h3>${ic('steth')}ข้อวินิจฉัยทางการพยาบาลและแผนการรักษาผู้ป่วยโรคหัวใจ (AN ${a.an} · ${fullName(p)})</h3>
+          <div class="row wrap">
+            ${!ro ? `<button class="btn soft sm" data-act="autoCarePlan" data-an="${a.an}">${ic('spark', 14)}วิเคราะห์และแนะนำแผนอัตโนมัติตามคลินิก</button>` : ''}
+            <button class="btn sm" data-go="#/careplan">${ic('book', 14)}ดูคลังมาตรฐาน 10 ข้อวินิจฉัย</button>
+            <button class="btn sm" data-act="print">${ic('printer', 14)}พิมพ์แผนการพยาบาล</button>
+          </div>
+        </div>
+        <form class="card-b stack" style="gap:14px" id="carePlanForm" onsubmit="return false">
+          <div>
+            <div class="lbl" style="margin-bottom:6px">1. เลือกข้อวินิจฉัยทางการพยาบาลผู้ป่วยโรคหัวใจ (คลิกเลือกได้มากกว่า 1 ข้อ — ระบบจะดึงแผนมาตรฐานให้อัตโนมัติ)</div>
+            <div class="grid g2" style="gap:8px">${checklist}</div>
+          </div>
+          ${F('สรุปข้อวินิจฉัยทางการพยาบาล (Nursing Diagnosis Summary)', inp('summary', c.summary || '', { ro }))}
+          <div class="grid g2">
+            ${F('2. แผนการรักษาของแพทย์ (Medical Treatment Plan & Medication Regimen)', `<textarea class="inp" name="treatmentPlan" rows="6" ${ro ? 'readonly' : ''}>${esc(c.treatmentPlan || '')}</textarea>`)}
+            ${F('3. ข้อมูลสนับสนุน & เป้าหมายการพยาบาล (Assessment & Expected Outcomes)', `<textarea class="inp" name="goals" rows="6" ${ro ? 'readonly' : ''}>${esc(c.goals || '')}</textarea>`)}
+          </div>
+          <div class="grid g2">
+            ${F('4. กิจกรรมการพยาบาลจำเพาะ (Nursing Interventions)', `<textarea class="inp" name="interventions" rows="7" ${ro ? 'readonly' : ''}>${esc(c.interventions || '')}</textarea>`)}
+            ${F('5. การประเมินผลการพยาบาล & การวางแผนจำหน่าย (Evaluation & D-METHOD)', `<textarea class="inp" name="evaluation" rows="7" ${ro ? 'readonly' : ''}>${esc(c.evaluation || '')}</textarea>`)}
+          </div>
+          <div class="row" style="justify-content:space-between">
+            <span class="xs muted">บันทึกเมื่อ: ${fdt(c.updatedAt)} · ผู้บันทึก: ${esc(c.by || '-')}</span>
+            ${!ro ? `<button type="button" class="btn primary lg" data-act="saveCarePlan" data-an="${a.an}">${ic('save')}บันทึกแผนการรักษาและแผนการพยาบาล</button>` : ''}
+          </div>
+        </form>
+      </div>
+    </div>`;
+  };
+
+  A.toggleNdCode = (el) => {
+    const a = adm(el.dataset.an);
+    if (!a) return;
+    const f = $('#carePlanForm');
+    const codes = [...f.querySelectorAll('[name=ndCode]:checked')].map((x) => x.value);
+    const selected = ND_LIST.filter((n) => codes.includes(n.code));
+    const tx = [], goals = [], intv = [], evals = [];
+    selected.forEach((n) => {
+      (n.treatmentPlan || []).forEach((t) => { if (!tx.includes('• ' + t)) tx.push('• ' + t); });
+      (n.goals || []).forEach((g) => { if (!goals.includes('• ' + g)) goals.push('• ' + g); });
+      intv.push(`[${n.code}: ${n.title}]`);
+      (n.interventions || []).forEach((iv) => intv.push('  ' + iv));
+      if (n.evaluation) evals.push(`• (${n.code}) ${n.evaluation}`);
+    });
+    a.care = {
+      codes,
+      summary: selected.map((n, i) => `${i + 1}. ${n.title}`).join(' | '),
+      treatmentPlan: tx.join('\n'),
+      goals: goals.join('\n'),
+      interventions: intv.join('\n'),
+      evaluation: evals.join('\n'),
+      updatedAt: S.now,
+      by: user().name
+    };
+    save(); render();
+  };
+
+  A.autoCarePlan = (el) => {
+    const a = adm(el.dataset.an);
+    if (!a) return;
+    a.care = { ...window.suggestCarePlanForAdm(a), updatedAt: S.now, by: user().name };
+    audit('UPDATE', 'CarePlan', a.an, `สร้างแผนการพยาบาลอัตโนมัติ (${a.care.codes.join(', ')})`);
+    save(); render();
+    toast('วิเคราะห์และดึงแผนการพยาบาลมาตรฐานตามข้อมูลคลินิกเรียบร้อยแล้ว');
+  };
+
+  A.saveCarePlan = (el) => {
+    const a = adm(el.dataset.an);
+    const f = $('#carePlanForm');
+    if (!a || !f) return;
+    const codes = [...f.querySelectorAll('[name=ndCode]:checked')].map((x) => x.value);
+    a.care = {
+      codes,
+      summary: f.elements.summary.value.trim(),
+      treatmentPlan: f.elements.treatmentPlan.value.trim(),
+      goals: f.elements.goals.value.trim(),
+      interventions: f.elements.interventions.value.trim(),
+      evaluation: f.elements.evaluation.value.trim(),
+      updatedAt: S.now,
+      by: user().name
+    };
+    audit('UPDATE', 'CarePlan', a.an, `บันทึกแผนการรักษาและแผนการพยาบาล (${codes.join(', ') || 'กำหนดเอง'})`);
+    save(); render();
+    toast('บันทึกแผนการรักษาและแผนการพยาบาลเรียบร้อยแล้ว');
+  };
+
+  P.careplan = (q) => {
+    const kw = (q.q || '').toLowerCase().trim();
+    const list = ND_LIST.filter((n) => !kw || JSON.stringify(n).toLowerCase().includes(kw));
+    return `<div class="page-h">
+      <div>
+        <h1>คลังมาตรฐานข้อวินิจฉัยการพยาบาล & แผนการรักษาโรคหัวใจ</h1>
+        <p>มาตรฐานการพยาบาลผู้ป่วยวิกฤตหัวใจและหลอดเลือด (ACS / STEMI / NSTEMI / Heart Failure / Shock / Arrhythmia / SK / ETT / TR-band / Sheath)</p>
+      </div>
+      <div class="row">
+        <button class="btn" data-go="#/patients">${ic('clipboard')}ไปที่ทะเบียนผู้ป่วยเพื่อเขียนแผนรายบุคคล</button>
+        <button class="btn" data-act="print">${ic('printer')}พิมพ์มาตรฐานแผนการพยาบาล</button>
+      </div>
+    </div>
+    <div class="grid g2" style="gap:14px">
+      ${list.map((nd) => `<div class="card">
+        <div class="card-h">
+          <div>
+            <div class="row" style="gap:8px"><span class="chip primary">${nd.code}</span><b>${esc(nd.title)}</b></div>
+            <div class="xs muted" style="margin-top:3px">${esc(nd.cause)}</div>
+          </div>
+        </div>
+        <div class="card-b stack" style="gap:10px">
+          <div><div class="xs b" style="color:var(--primary)">🔍 ข้อมูลสนับสนุน (Subjective / Objective Data)</div><ul style="margin:4px 0 0 18px;padding:0" class="small t2">${(nd.subjectiveObj || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
+          <div><div class="xs b" style="color:var(--ok)">🎯 เป้าหมายและเกณฑ์การประเมินผล (Expected Outcomes)</div><ul style="margin:4px 0 0 18px;padding:0" class="small t2">${(nd.goals || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
+          <div><div class="xs b" style="color:#1e40af">💊 แผนการรักษาของแพทย์ที่เกี่ยวข้อง (Medical Treatment Plan)</div><ul style="margin:4px 0 0 18px;padding:0" class="small t2">${(nd.treatmentPlan || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
+          <div><div class="xs b" style="color:#0f4c81">🩺 กิจกรรมการพยาบาลมาตรฐาน (Nursing Interventions)</div><ul style="margin:4px 0 0 4px;padding:0;list-style:none" class="small t2">${(nd.interventions || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
+          <div class="xs" style="border-top:1px dashed var(--border);padding-top:6px;color:var(--ok)"><b>✅ การประเมินผล (Evaluation):</b> ${esc(nd.evaluation)}</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  };
+
+  if (S && S.admissions) S.admissions.forEach((a) => window.ensureAdmCarePlan(a));
+  render();
+})();
