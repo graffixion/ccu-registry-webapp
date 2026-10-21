@@ -557,8 +557,8 @@ TAB.out = (a) => {
   if (!dc.type && sel0) dc.type = sel0;
   const liveDev = a.dev.filter((d) => !d.out);
   const c = completeness(a, true);
-  const needDev = sel0 !== 'เสียชีวิต' && liveDev.length;
-  const blockers = [...(needDev ? liveDev.map((d) => `ยังไม่ได้ถอด ${d.type} (${d.site})`) : []), ...(sel0 === 'เสียชีวิต' ? [] : c.missing.map((m) => `ข้อมูลไม่ครบ: ${m}`))];
+  const blockers = sel0 === 'เสียชีวิต' ? [] : c.missing.map((m) => `ข้อมูลไม่ครบ: ${m}`);
+  const devNote = liveDev.length ? `<div class="infobox"><b>${ic('info', 15)} อุปกรณ์ที่ยังคาอยู่ ${liveDev.length} รายการ — จำหน่ายได้โดยไม่ต้องถอด</b>${liveDev.map((d) => `<div>• ${d.type} (${d.site})</div>`).join('')}<div class="xs">ระบบจะบันทึกเวลาสิ้นสุดเป็นเวลาออกจากตึก (ออกไปพร้อมผู้ป่วย)</div></div>` : '';
   const opt = (t, cls, icon) => `<div class="opt ${sel0 === t ? 'on' : ''}" data-act="dcType" data-an="${a.an}" data-t="${t}"><span class="ic-box" style="background:var(--${cls}-bg);color:var(--${cls})">${ic(icon, 16)}</span>${t === 'ทุเลา' ? 'ทุเลา (กลับบ้าน)' : t}</div>`;
   return `<div class="cols2"><div class="card"><div class="card-h"><h3>${ic('logout')}จำหน่าย / ออกจากตึก</h3><label class="check small"><input type="checkbox" ${a.dcPending ? 'checked' : ''} data-on="dcPending" data-an="${a.an}">ตั้งสถานะ "รอจำหน่าย"</label></div>
     <form class="card-b stack" style="gap:14px" id="dcForm" data-an="${a.an}" novalidate>
@@ -570,6 +570,7 @@ TAB.out = (a) => {
       ${F('สรุปผลการรักษา', `<textarea class="inp" name="summary" data-on="dcText" data-an="${a.an}" data-k="summary">${esc(dc.summary || '')}</textarea>`)}
       ${!['เสียชีวิต', 'ย้ายตึก'].includes(sel0) ? `<div class="field"><span class="label">ยากลับบ้าน ${isACS(a) ? '(บังคับสำหรับ ACS: 5 กลุ่มแรก)' : ''}</span><div class="grid g2" style="gap:8px">${MEDS.map((m) => `<div class="row between" style="border:1px solid var(--border);border-radius:9px;padding:4px 4px 4px 10px"><span class="small">${m}</span><select class="inp" style="width:150px;height:34px" data-on="med" data-an="${a.an}" data-m="${m}">${['', 'ให้', 'ไม่ให้ (มีข้อห้าม)', 'ไม่ให้ (อื่น ๆ)'].map((v) => `<option ${dc.meds[m] === v ? 'selected' : ''} value="${v}">${v || '— ระบุ —'}</option>`).join('')}</select></div>`).join('')}</div></div>
         ${F('นัดติดตาม', `<input class="inp" type="date" value="${dc.fu || ''}" data-on="dcText" data-an="${a.an}" data-k="fu">`)}` : ''}
+      ${devNote}
       ${blockers.length ? `<div class="blockers"><b>${ic('alertcircle', 15)} ยังจำหน่ายไม่ได้ (${blockers.length} รายการ)</b>${blockers.map((b) => `<div>• ${b}</div>`).join('')}</div>
         ${canOverride() ? `${F('Override โดยหัวหน้าตึก/แพทย์ — ระบุเหตุผล', inp('override', '', { ph: 'เช่น ญาติขอรับกลับด่วน / ส่งต่อฉุกเฉิน' }))}` : '<div class="xs muted">ต้องให้หัวหน้าตึกหรือแพทย์ override ถ้าจำเป็นต้องจำหน่ายทันที</div>'}` : '<div class="okbox">' + ic('checkcircle', 15) + ' ข้อมูลครบ พร้อมจำหน่าย</div>'}
       <button class="btn primary lg" data-act="dcSubmit" data-an="${a.an}" ${blockers.length && !canOverride() ? 'disabled' : ''}>${ic('check')}ยืนยัน${sel0 === 'ย้ายตึก' ? 'การย้ายตึก' : 'การจำหน่าย'}</button>` : '<div class="small muted">เลือกสถานะเพื่อกรอกข้อมูลต่อ</div>'}
@@ -1066,7 +1067,7 @@ A.dcSubmit = (el, e) => {
   const v = (n) => f.elements[n]?.value || '';
   a.status = 'out';
   a.out = { type, at: v('at'), dest: v('dest'), cause: v('cause'), summary: dc.summary, meds: Object.fromEntries(Object.entries(dc.meds).filter(([, x]) => x)), fu: dc.fu, override: ov ? `${ov} — ${user().name}` : '' };
-  a.dev.filter((d) => !d.out && type === 'เสียชีวิต').forEach((d) => (d.out = v('at')));
+  a.dev.filter((d) => !d.out).forEach((d) => { d.out = v('at'); d.meta = { ...d.meta, note: type === 'เสียชีวิต' ? 'สิ้นสุดเมื่อผู้ป่วยเสียชีวิต' : `ออกจากตึกพร้อมผู้ป่วย (${type})` }; });
   a.mv.push({ at: v('at'), from: `ตึกหัวใจฯ เตียง ${a.bed}`, to: type === 'ทุเลา' ? 'บ้าน' : v('dest') || type });
   const bed = a.bed; a.bed = null; a.dcPending = false;
   audit('DISCHARGE', 'Admission', a.an, `${type}${v('dest') ? ' · ' + v('dest') : ''}${ov ? ' (override)' : ''}`);
